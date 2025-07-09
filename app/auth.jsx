@@ -1,19 +1,55 @@
 import { Image } from 'expo-image';
 import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native'
-import { Text, TextInput } from 'react-native-paper'
+import { Text, TextInput, useTheme } from 'react-native-paper'
 // import { Button, ButtonText } from "@/components/ui/button"
 import { Button } from 'react-native-paper';
+import { useAuth } from '../lib/auth-context';
+import { useRouter } from 'expo-router';
 
 export default function Auth() {
 
+    const theam = useTheme();
+    const router = useRouter();
+
+    const { signIn, signUp } = useAuth();
+
     const [isSignUp, setIsSignUp] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
     const handleSwitchMode = () => {
         setIsSignUp((prev) => !prev);
     }
 
-    const handleAuth = () => {
+    const handleAuth = async () => {
+        if (!email || !password) {
+            setError("Please fill all fields.");
+            return;
+        }
+
+        if (password.length < 4) {
+            setError("Password must be at-least 4 characters long.");
+            return;
+        }
+        setError(null);
+
+        if (isSignUp) {
+            const error = await signUp(email, password);
+            if (error) {
+                setError(error);
+                return;
+            }
+        } else {
+            const error = await signIn(email, password);
+            if (error) {
+                setError(error);
+                return;
+            }
+        }
+
+        router.replace("/");
 
     }
 
@@ -45,6 +81,7 @@ export default function Auth() {
                     keyboardType='email-address'
                     placeholder='example@gmail.com'
                     mode='outlined'
+                    onChangeText={setEmail}
                 />
                 <TextInput
                     style={styles.input}
@@ -52,7 +89,14 @@ export default function Auth() {
                     autoCapitalize='none'
                     keyboardType='visible-password'
                     mode='outlined'
+                    onChangeText={setPassword}
                 />
+
+                {
+                    error && (
+                        <Text style={{ color: theam.colors.error }}>{error}</Text>
+                    )
+                }
 
                 <View style={{ alignItems: 'center' }}>
                     <Button

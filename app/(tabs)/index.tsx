@@ -1,7 +1,12 @@
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
+
+  const { signOut } = useAuth();
+
   return (
     <View
       style={{
@@ -11,6 +16,9 @@ export default function Index() {
       }}
     >
       <Text>Edit app/index.tsx to edit this screen.</Text>
+      <Button onPress={signOut}>
+        <Text style={{ color: 'white' }}>SignOut</Text>
+      </Button>
     </View>
   );
 }
