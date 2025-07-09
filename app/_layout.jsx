@@ -6,6 +6,7 @@ import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { ReactNode, useEffect } from "react";
 
 import { AuthProvider, useAuth, isLoadingUser } from '../lib/auth-context';
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 function RouteGuard({ children }) {
   const router = useRouter();
@@ -31,14 +32,16 @@ function RouteGuard({ children }) {
 
 export default function RootLayout() {
   return <AuthProvider>
-    <RouteGuard>
-      <GluestackUIProvider mode="light">
+    <SafeAreaProvider>
+      <RouteGuard>
+        <GluestackUIProvider mode="light">
 
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
 
-      </GluestackUIProvider>
-    </RouteGuard>
+        </GluestackUIProvider>
+      </RouteGuard>
+    </SafeAreaProvider>
   </AuthProvider>;
 }

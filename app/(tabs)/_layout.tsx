@@ -4,17 +4,83 @@ import { Tabs } from "expo-router";
 
 export default function TabsLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: "coral" }}>
+    <Tabs screenOptions={{
+      tabBarShowLabel: false,
+      tabBarActiveTintColor: "coral",
+      headerStyle: {
+        backgroundColor: "coral",
+      },
+      headerShadowVisible: false,
+      tabBarStyle: {
+        backgroundColor: "coral",
+        borderTopWidth: 0,
+        elevation: 0,
+        shadowOpacity: 0,
+      },
+    }}>
       <Tabs.Screen name="index" options={{
-        title: "Home", tabBarIcon: ({ color, focused }) => {
+        title: "🌱 Today's Habits 🌱", tabBarIcon: ({ color, focused }) => {
           return focused ? (
-            <Ionicons name="home-outline" size={25} color={color} />
+            <Ionicons name="home-outline" size={25} color={"white"} />
           ) : (
             <AntDesign name="home" size={25} color="black" />
           )
+        },
+        headerTitleStyle: {
+          color: 'white',
+          fontSize: 25,
+          fontWeight: "bold",
+          fontFamily: 'monospace'
         }
       }} />
-      <Tabs.Screen name="login" options={{ title: "Login" }} />
-    </Tabs>
+
+      <Tabs.Screen
+        name="add-habit"
+        options={{
+          title: "➕ Add Habit ➕",
+          tabBarLabel: "", // hides the label under the icon
+          tabBarIcon: ({ focused }) =>
+            focused ? (
+              <Ionicons name="add-circle-outline" size={25} color="white" />
+            ) : (
+              <AntDesign name="pluscircleo" size={25} color="black" />
+            ),
+          headerTitleStyle: {
+            color: "white",
+            fontSize: 24,
+            fontWeight: "bold",
+            fontFamily: "monospace",
+          },
+          headerStyle: {
+            backgroundColor: "coral",
+          },
+        }}
+      />
+
+
+      <Tabs.Screen
+        name="streaks"
+        options={{
+          title: "🔥 Habit Streaks 🔥",
+          tabBarLabel: "", // Hides the label under the icon
+          tabBarIcon: ({ color, focused }) =>
+            focused ? (
+              <Ionicons name="flame-outline" size={25} color="white" />
+            ) : (
+              <AntDesign name="rocket1" size={25} color="black" />
+            ),
+          headerTitleStyle: {
+            color: "white",
+            fontSize: 24,
+            fontWeight: "bold",
+            fontFamily: "monospace",
+          },
+          headerStyle: {
+            backgroundColor: "coral",
+          },
+        }}
+      />
+
+    </Tabs >
   )
 }
