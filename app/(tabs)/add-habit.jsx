@@ -37,6 +37,10 @@ export default function AddHabit() {
         }
       );
 
+      setTitle("");
+      setDescription("");
+      setFrequency("daily");
+
       router.back();
     } catch (error) {
       console.log("Error in create new habit: ", error.message);

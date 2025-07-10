@@ -1,15 +1,15 @@
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
+import { Box } from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { DATABASE_ID, databases, HABITS_COLLECTION_ID } from "@/lib/appwrite";
 import { useAuth } from "@/lib/auth-context";
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { Query } from "react-native-appwrite";
-import { Box } from "@/components/ui/box";
-import { HStack } from "@/components/ui/hstack";
-import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
-import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar"
-import { Card } from "@/components/ui/card"
-import { Heading } from "@/components/ui/heading"
 // import { Text } from "@/components/ui/text"
 import { VStack } from "@/components/ui/vstack";
 
@@ -118,10 +118,15 @@ function LoaderSkeleton() {
 }
 
 function HabitCard({ habitProp }) {
+
+  const date = formatReadableDate(habitProp.$createdAt);
+
   return (
     <Card className="p-5 rounded-lg w-[360px] m-3" style={styles.habitCard}>
-      <Text className="text-sm font-normal mb-2 text-typography-700">
-        May 15, 2023
+      <Text className="text-sm font-normal mb-2 text-typography-700" style={{
+        color: 'green'
+      }}>
+        {date}
       </Text>
       <VStack className="mb-6">
         <Heading size="md" className="mb-4">
@@ -142,20 +147,59 @@ function HabitCard({ habitProp }) {
             alt="image"
           />
         </Avatar>
-        <VStack>
-          <Heading size="sm" className="mb-1">
-            Frequency: {habitProp.frequency}
-          </Heading>
-          <Text size="sm" style={{
-            backgroundColor: '#ff3e0',
-            textAlign: 'center',
-            paddingLeft: 5,
-            paddingRight: 5,
-            borderRadius: 5,
-            color: '#ff9800'
-          }}>Steak: {habitProp.steak_count}</Text>
+        <VStack style={{
+          flex: 1,
+          flexDirection: 'row',
+          justifyContent: 'space-between'
+        }}>
+          <View style={{
+            backgroundColor: '#ede7f6',
+            borderRadius: 10,
+            padding: 5,
+          }}>
+            <Heading size="sm" className="mb-1" style={{
+              color: '#7c4dff',
+              fontWeight: 'bold',
+              alignItems: 'center',
+              padding: 5,
+              textTransform: 'uppercase'
+            }}>
+              ⏱️ {habitProp.frequency}
+            </Heading>
+          </View>
+          <View style={{
+            backgroundColor: '#fff3e0',
+            borderRadius: 10,
+            padding: 5,
+          }}>
+            <Text size="sm" style={{
+              textAlign: 'center',
+              // paddingLeft: 5,
+              // paddingRight: 5,
+              padding: 5,
+              borderRadius: 5,
+              color: '#ff9800',
+              fontWeight: 'bold',
+              alignSelf: 'center',
+            }}>🔥 Steak: {habitProp.steak_count}</Text>
+          </View>
         </VStack>
       </Box>
     </Card>
   )
+}
+
+export function formatReadableDate(dateString) {
+  const date = new Date(dateString);
+
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  };
+
+  return date.toLocaleString('en-US', options);
 }
