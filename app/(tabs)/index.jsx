@@ -38,7 +38,7 @@ export default function Index() {
     } catch (error) {
       console.log("Error in fetch habits: ", error.message);
       Alert.alert("Error", "Error in fetch habits!");
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   }
@@ -67,10 +67,10 @@ export default function Index() {
         habits.length === 0 || isLoading === true ? (
           <LoaderSkeleton />
         ) : (
-          habits.map((habit, key)=>(
+          habits.map((habit, key) => (
             <View key={habit.$id || key}>
               {/* <Text>{habit.description}</Text> */}
-              <HabitCard habitProp={habit}/>
+              <HabitCard habitProp={habit} />
             </View>
           ))
         )
@@ -91,6 +91,16 @@ const styles = StyleSheet.create({
   signOutButton: {
     borderRadius: 12,
     height: 42
+  },
+  habitCard: {
+    shadowColor: 'red',
+    shadowOffset: {
+      width: 0,
+      height: 5
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 5
   }
 });
 
@@ -107,9 +117,9 @@ function LoaderSkeleton() {
   )
 }
 
-function HabitCard({habitProp}) {
+function HabitCard({ habitProp }) {
   return (
-    <Card className="p-5 rounded-lg w-[360px] m-3">
+    <Card className="p-5 rounded-lg w-[360px] m-3" style={styles.habitCard}>
       <Text className="text-sm font-normal mb-2 text-typography-700">
         May 15, 2023
       </Text>
@@ -123,20 +133,27 @@ function HabitCard({habitProp}) {
         </Text>
       </VStack>
       <Box className="flex-row">
-        <Avatar className="mr-3">
-          <AvatarFallbackText>RR</AvatarFallbackText>
+        <Avatar className="mr-3" style={{ backgroundColor: 'white' }}>
+          <AvatarFallbackText>H</AvatarFallbackText>
           <AvatarImage
             source={{
-              uri: "https://gluestack.github.io/public-blog-video-assets/john.png",
+              uri: "https://img.icons8.com/?size=100&id=houGsYyNpCbu&format=png&color=000000",
             }}
             alt="image"
           />
         </Avatar>
         <VStack>
           <Heading size="sm" className="mb-1">
-            John Smith
+            Frequency: {habitProp.frequency}
           </Heading>
-          <Text size="sm">Motivational Speaker</Text>
+          <Text size="sm" style={{
+            backgroundColor: '#ff3e0',
+            textAlign: 'center',
+            paddingLeft: 5,
+            paddingRight: 5,
+            borderRadius: 5,
+            color: '#ff9800'
+          }}>Steak: {habitProp.steak_count}</Text>
         </VStack>
       </Box>
     </Card>
