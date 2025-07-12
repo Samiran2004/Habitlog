@@ -1,11 +1,11 @@
 import { Image } from 'expo-image';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { Button, SegmentedButtons, TextInput } from 'react-native-paper';
 import { useAuth } from '../../lib/auth-context';
 import { DATABASE_ID, databases, HABITS_COLLECTION_ID } from '../../lib/appwrite';
 import { ID } from 'react-native-appwrite';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 const FREQUENCIES = ["daily", "weekly", "monthly"];
 
@@ -18,9 +18,7 @@ export default function AddHabit() {
 
   const handleSubmit = async () => {
     try {
-      if (!user) {
-        return;
-      }
+      if (!user) return;
 
       await databases.createDocument(
         DATABASE_ID,
@@ -41,12 +39,22 @@ export default function AddHabit() {
       setDescription("");
       setFrequency("daily");
 
-      router.back();
+      router.replace('./');
+
     } catch (error) {
       console.log("Error in create new habit: ", error.message);
       Alert.alert("Error", "Error to create new habit.");
     }
   };
+
+  const resetFields = useCallback(() => {
+    setTitle("");
+    setDescription("");
+    setFrequency("daily");
+  }, []);
+
+  useFocusEffect(resetFields);
+
 
   return (
     <KeyboardAvoidingView
@@ -67,8 +75,8 @@ export default function AddHabit() {
       </View>
       <View style={styles.inner}>
 
-        <TextInput label="Title" mode="outlined" style={styles.input} onChangeText={setTitle} />
-        <TextInput label="Description" mode="outlined" style={styles.input} onChangeText={setDescription} />
+        <TextInput label="Title" mode="outlined" style={styles.input} onChangeText={setTitle} value={title}/>
+        <TextInput label="Description" mode="outlined" style={styles.input} onChangeText={setDescription} value={description}/>
 
         <SegmentedButtons
           buttons={FREQUENCIES.map((item) => ({

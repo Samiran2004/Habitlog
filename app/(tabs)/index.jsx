@@ -7,11 +7,14 @@ import { HStack } from "@/components/ui/hstack";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { DATABASE_ID, databases, HABITS_COLLECTION_ID } from "@/lib/appwrite";
 import { useAuth } from "@/lib/auth-context";
-import { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Query } from "react-native-appwrite";
 // import { Text } from "@/components/ui/text"
 import { VStack } from "@/components/ui/vstack";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Swipeable } from "react-native-gesture-handler";
+import { router, useFocusEffect } from "expo-router";
 
 export default function Index() {
 
@@ -19,6 +22,8 @@ export default function Index() {
   const [habits, setHabits] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   console.log(habits);
+
+  const swipeableRef = useRef({});
 
   const fetchHabits = async () => {
     try {
@@ -37,15 +42,39 @@ export default function Index() {
 
     } catch (error) {
       console.log("Error in fetch habits: ", error.message);
-      Alert.alert("Error", "Error in fetch habits!");
+      // Alert.alert("Error", "Error in fetch habits!");
     } finally {
       setIsLoading(false);
     }
   }
 
-  useEffect(() => {
-    fetchHabits();
-  }, [user]);
+  const deleteHabit = async (id) => {
+    try {
+      await databases.deleteDocument(DATABASE_ID, HABITS_COLLECTION_ID, id);
+      setHabits((prevHabits) => prevHabits.filter((habit) => habit.$id !== id));
+    } catch (error) {
+      console.log("Error in delete habit: ", error.message);
+    }
+  };
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchHabits();
+    }, [user])
+  );
+
+  const renderLeftActions = () => (
+    <View style={styles.swipeLeftAction}>
+      <MaterialCommunityIcons name="check-circle" size={36} color={"green"} />
+    </View>
+  )
+
+  const renderRightActions = () => (
+    <View style={styles.swipeRightAction}>
+      <MaterialCommunityIcons name="delete" size={36} color={"red"} />
+    </View>
+  )
 
   return (
     <View
@@ -67,12 +96,30 @@ export default function Index() {
         habits.length === 0 || isLoading === true ? (
           <LoaderSkeleton />
         ) : (
-          habits.map((habit, key) => (
-            <View key={habit.$id || key}>
-              {/* <Text>{habit.description}</Text> */}
-              <HabitCard habitProp={habit} />
-            </View>
-          ))
+          <FlatList
+            data={habits}
+            keyExtractor={(item, index) => item.$id ?? index.toString()}
+            renderItem={({ item }) => (
+              <Swipeable ref={(ref) => {
+                swipeableRef.current[item.$id] = ref
+              }}
+                key={item.$id}
+                overshootLeft={false}
+                overshootRight={false}
+                renderLeftActions={renderLeftActions}
+                renderRightActions={renderRightActions}
+                onSwipeableOpen={(direction) => {
+                  if (direction === "right") {
+                    deleteHabit(item.$id);
+                  }
+                }}
+              >
+                <HabitCard habitProp={item} />
+              </Swipeable>
+            )}
+            showsVerticalScrollIndicator={false}
+          />
+
         )
       }
     </View>
@@ -101,6 +148,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 8,
     elevation: 5
+  },
+  swipeLeftAction: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    backgroundColor: '#e0f7fa',
+    padding: 16,
+    borderRadius: 8,
+  },
+  swipeRightAction: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    backgroundColor: '#fae0e0',
+    padding: 16,
+    borderRadius: 8,
   }
 });
 
