@@ -1,13 +1,13 @@
 import { Stack, useRouter, useSegments } from "expo-router";
 
-import "@/global.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import "@/global.css";
 
-import { ReactNode, useEffect } from "react";
+import { useEffect } from "react";
 
-import { AuthProvider, useAuth, isLoadingUser } from '../lib/auth-context';
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { AuthProvider, useAuth } from '../lib/auth-context';
 
 function RouteGuard({ children }) {
   const router = useRouter();

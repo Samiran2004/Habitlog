@@ -7,20 +7,21 @@ import { HStack } from "@/components/ui/hstack";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { DATABASE_ID, databases, HABIT_COMPLETION_ID, HABITS_COLLECTION_ID } from "@/lib/appwrite";
 import { useAuth } from "@/lib/auth-context";
-import React, { useEffect, useRef, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
 import { ID, Query } from "react-native-appwrite";
 // import { Text } from "@/components/ui/text"
 import { VStack } from "@/components/ui/vstack";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "expo-router";
 import { Swipeable } from "react-native-gesture-handler";
-import { router, useFocusEffect } from "expo-router";
 
 export default function Index() {
 
   const { signOut, user } = useAuth();
   const [habits, setHabits] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [completedHabits, setCompletedHabits] = useState([]);
   console.log(habits);
 
   const swipeableRef = useRef({});
@@ -58,6 +59,11 @@ export default function Index() {
   };
 
   const handleCompleteHabit = async (id) => {
+    if(completedHabits.includes(id)){
+      Alert.alert("Notification", "Today's Steak Complete already!");
+      await fetchHabits();
+      return;
+    }
     try {
       const currentDate = new Date().toISOString();
 
@@ -84,21 +90,42 @@ export default function Index() {
           last_completed: currentDate
         }
       );
-
-      // Either:
       await fetchHabits();
-      // or:
-      // setHabits(...)
+      await fetchTodayCompleteHabits();
 
     } catch (error) {
       console.log("Error in complete habit: ", error.message);
     }
   };
 
+  const fetchTodayCompleteHabits = async () => {
+    try {
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        HABIT_COMPLETION_ID,
+        [
+          Query.equal("user_id", user.$id),
+          Query.greaterThanEqual("completed_at", today.toISOString())
+        ]
+      );
+
+      const completion = response.documents;
+      setCompletedHabits(completion.map((h) => h.habit_id));
+
+    } catch (error) {
+      console.log("Error in fetch today's completed habits: ", error.message);
+    }
+  }
+
 
   useFocusEffect(
     React.useCallback(() => {
       fetchHabits();
+      fetchTodayCompleteHabits();
     }, [user])
   );
 
