@@ -5,11 +5,11 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
-import { DATABASE_ID, databases, HABITS_COLLECTION_ID } from "@/lib/appwrite";
+import { DATABASE_ID, databases, HABIT_COMPLETION_ID, HABITS_COLLECTION_ID } from "@/lib/appwrite";
 import { useAuth } from "@/lib/auth-context";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
-import { Query } from "react-native-appwrite";
+import { ID, Query } from "react-native-appwrite";
 // import { Text } from "@/components/ui/text"
 import { VStack } from "@/components/ui/vstack";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -54,6 +54,44 @@ export default function Index() {
       setHabits((prevHabits) => prevHabits.filter((habit) => habit.$id !== id));
     } catch (error) {
       console.log("Error in delete habit: ", error.message);
+    }
+  };
+
+  const handleCompleteHabit = async (id) => {
+    try {
+      const currentDate = new Date().toISOString();
+
+      await databases.createDocument(
+        DATABASE_ID,
+        HABIT_COMPLETION_ID,
+        ID.unique(), // ✅ Corrected here
+        {
+          habit_id: id,
+          user_id: user.$id,
+          completed_at: currentDate
+        }
+      );
+
+      const habit = habits.find((h) => h.$id === id);
+      if (!habit) return;
+
+      await databases.updateDocument(
+        DATABASE_ID,
+        HABITS_COLLECTION_ID,
+        id,
+        {
+          steak_count: habit.steak_count + 1,
+          last_completed: currentDate
+        }
+      );
+
+      // Either:
+      await fetchHabits();
+      // or:
+      // setHabits(...)
+
+    } catch (error) {
+      console.log("Error in complete habit: ", error.message);
     }
   };
 
@@ -111,6 +149,8 @@ export default function Index() {
                 onSwipeableOpen={(direction) => {
                   if (direction === "right") {
                     deleteHabit(item.$id);
+                  } else if (direction === "left") {
+                    handleCompleteHabit(item.$id);
                   }
                 }}
               >
