@@ -59,7 +59,7 @@ export default function Index() {
   };
 
   const handleCompleteHabit = async (id) => {
-    if(completedHabits.includes(id)){
+    if (completedHabits.includes(id)) {
       Alert.alert("Notification", "Today's Steak Complete already!");
       await fetchHabits();
       return;
@@ -70,7 +70,7 @@ export default function Index() {
       await databases.createDocument(
         DATABASE_ID,
         HABIT_COMPLETION_ID,
-        ID.unique(), // ✅ Corrected here
+        ID.unique(),
         {
           habit_id: id,
           user_id: user.$id,
@@ -181,7 +181,7 @@ export default function Index() {
                   }
                 }}
               >
-                <HabitCard habitProp={item} />
+                <HabitCard habitProp={item} completedHabits={completedHabits} />
               </Swipeable>
             )}
             showsVerticalScrollIndicator={false}
@@ -231,6 +231,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fae0e0',
     padding: 16,
     borderRadius: 8,
+  },
+  completedHabitCard: {
+    backgroundColor: '#aafbbe',
+    opacity: 0.6
   }
 });
 
@@ -247,12 +251,13 @@ function LoaderSkeleton() {
   )
 }
 
-function HabitCard({ habitProp }) {
+function HabitCard({ habitProp, completedHabits }) {
 
   const date = formatReadableDate(habitProp.$createdAt);
+  const isCompleted = completedHabits.includes(habitProp.$id);
 
   return (
-    <Card className="p-5 rounded-lg w-[360px] m-3" style={styles.habitCard}>
+    <Card className="p-5 rounded-lg w-[360px] m-3" style={[styles.habitCard, isCompleted && styles.completedHabitCard]}>
       <Text className="text-sm font-normal mb-2 text-typography-700" style={{
         color: 'green'
       }}>
