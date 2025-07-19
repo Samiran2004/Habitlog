@@ -57,30 +57,6 @@ export default function TabsLayout() {
         }}
       />
 
-
-      <Tabs.Screen
-        name="streaks"
-        options={{
-          title: "🔥 Habit Streaks 🔥",
-          tabBarLabel: "", // Hides the label under the icon
-          tabBarIcon: ({ color, focused }) =>
-            focused ? (
-              <Ionicons name="flame-outline" size={25} color="white" />
-            ) : (
-              <AntDesign name="rocket1" size={25} color="black" />
-            ),
-          headerTitleStyle: {
-            color: "white",
-            fontSize: 24,
-            fontWeight: "bold",
-            fontFamily: "monospace",
-          },
-          headerStyle: {
-            backgroundColor: "coral",
-          },
-        }}
-      />
-
     </Tabs >
   )
 }

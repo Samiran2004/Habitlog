@@ -22,7 +22,7 @@ export default function Index() {
   const [habits, setHabits] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [completedHabits, setCompletedHabits] = useState([]);
-  console.log(habits);
+  // console.log(habits);
 
   const swipeableRef = useRef({});
 
